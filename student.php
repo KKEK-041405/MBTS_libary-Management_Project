@@ -1,6 +1,6 @@
 <?php
     include('sql_query\config.php');
-    if($_SESSION["is_LoggedIn"] != true){
+    if(!$_SESSION["is_LoggedIn"]  || $_SESSION['is_admin']){
         header("Location: index.php");
     }
     
@@ -42,7 +42,8 @@
     ?>
     <?php
     if($_GET['tab'] == "books"){
-    $result = mysqli_query($conn,"SELECT * FROM `books` WHERE 1");
+    $result = mysqli_query($conn,"SELECT DISTINCT  * FROM `books` WHERE 1");
+
     echo "<table id='mytable' class='display'><thead>
     <tr>
         <th scope='col' onclick=''>Accession_no</th>
@@ -51,32 +52,60 @@
         <th scope='col' onclick=''>Author</th>
         <th>Status</th>
         <th scope='col' onclick=''>Actions</th>
-        <!-- <th>Actions</th> -->
     </tr></thead>";
     while($row = mysqli_fetch_assoc($result)){
         $Status = ($row['is_available'] == 1) ? "available" : "unavailable" ;
         $id = $row['Accession_no'];
+        $PIN = $_SESSION["username"];
+        $BTN  = "<button type='button'id='$id' class='request_book btn btn-primary' data-bs-toggle='modal' data-bs-target='#myModal' >Request</button>";                                                                                                                                                                                                                                                                                                                                                    
+        $rer = mysqli_query($conn,"SELECT * FROM `transactions` WHERE `Accession_no` = '$id' AND `Reciver_pin-no` = '$PIN' AND `Status` = 'waiting for admin to accept' ");
+        $A = mysqli_fetch_all($rer);
+        $action = ($Status == "available" )?($A)?"Requested" :$BTN  :"-------------";
         echo "<tr><td>".$row['Accession_no']."</td>
                   <td>".$row['Title']."</td>
                   <td>".$row['Branch']."</td>
                   <td>".$row['Author']."</td>
                   <td>".$Status."</td>
-                  <td><button type='button'id='$id' class='request_book btn btn-primary' data-bs-toggle='modal' data-bs-target='#myModal' >Request</button></td>
+                  <td>$action</td>
               </tr>";
 
     } 
     }
     elseif($_GET['tab'] == "on_due"){
-        $result = mysqli_query($conn,"SELECT * FROM `transactions` WHERE `Reciver_pin-no`='".$_SESSION["username"]."' AND `Status` = 'ON_DUE'");
+        $result = mysqli_query($conn,"SELECT DISTINCT  * FROM `transactions` WHERE `Reciver_pin-no`='".$_SESSION["username"]."'");
         echo "<table class='table' id='mytable' class='display'>
-        <tr>
+        <thead><tr>
             <th scope='col' onclick=''>Transaction_id</th>
             <th scope='col' onclick=''>Accession_no</th>
             <th scope='col' onclick=''>Title</th>
             <th scope='col' onclick=''>Reciver_pin-no</th>
             <th scope='col' onclick=''>issuance_date</th>
             <th scope='col' onclick=''>Reurn_date</th>
-        </tr>";
+        </tr></thead>";
+        while($row = mysqli_fetch_assoc($result)){
+            // $Status = ($row['is_available'] == 1) ? "available" : "unavailable" ;
+            echo "<tr>
+                        <td>".$row['Transaction_id']."</td>
+                        <td>".$row['Accession_no']."</td>
+                        <td>".$row['Title']."</td>
+                        <td>".$row['Reciver_pin-no']."</td>
+                        <td>".$row['issuance_date']."</td>
+                        <td>".$row['Reurn_date']."</td
+                    </tr>";
+        }
+    }
+    elseif($_GET['tab'] == "Transactions"){
+        $result = mysqli_query($conn,"SELECT DISTINCT  * FROM `transactions` WHERE `Reciver_pin-no`='".$_SESSION["username"]."'");
+        echo "<table class='table' id='mytable' class='display'>
+        <thead><tr>
+            <th scope='col' onclick=''>Transaction_id</th>
+            <th scope='col' onclick=''>Accession_no</th>
+            <th scope='col' onclick=''>Title</th>
+            <th scope='col' onclick=''>Reciver_pin-no</th>
+            <th scope='col' onclick=''>issuance_date</th>
+            <th scope='col' onclick=''>Reurn_date</th>
+            <th scope='col' onclick=''>Status</th>
+        </tr></thead>";
         while($row = mysqli_fetch_assoc($result)){
             // $Status = ($row['is_available'] == 1) ? "available" : "unavailable" ;
             echo "<tr>
@@ -86,40 +115,12 @@
                         <td>".$row['Reciver_pin-no']."</td>
                         <td>".$row['issuance_date']."</td>
                         <td>".$row['Reurn_date']."</td>
-
-                    </tr>";
-
-        } 
-
-    }
-    elseif($_GET['tab'] == "Transactions"){
-        $result = mysqli_query($conn,"SELECT * FROM `transactions` WHERE `Reciver_pin-no`='".$_SESSION["username"]."'");
-        echo "<table class='table' id='mytable' class='display'>
-        <tr>
-            <th scope='col' onclick=''>Transaction_id</th>
-            <th scope='col' onclick=''>Accession_no</th>
-            <th scope='col' onclick=''>Title</th>
-            <th scope='col' onclick=''>Reciver_pin-no</th>
-            <th scope='col' onclick=''>issuance_date</th>
-            <th scope='col' onclick=''>Reurn_date</th>
-            <th scope='col' onclick=''>Status</th>
-            <!-- <th>Actions</th> -->
-        </tr>";
-        while($row = mysqli_fetch_assoc($result)){
-            // $Status = ($row['is_available'] == 1) ? "available" : "unavailable" ;
-            echo "<tr><td>".$row['Transaction_id']."</td>
-                        <td>".$row['Accession_no']."</td>
-                        <td>".$row['Title']."</td>
-                        <td>".$row['Reciver_pin-no']."</td>
-                        <td>".$row['issuance_date']."</td>
-                        <td>".$row['Reurn_date']."</td>
                         <td>".$row['Status']."</td>
                     </tr>";
-
         } 
-
     }
     ?>
+
     </table>
      <!-- RequestConfrimModal -->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
