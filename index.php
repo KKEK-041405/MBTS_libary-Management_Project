@@ -50,7 +50,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <meta name="keywords" content="MBTS libary,Libary, MBTS Govt. Polytechnic">
     <meta name="description" content="welcome to MBTS libary.">
     <title>MBTS libary</title>
-    <link rel="stylesheet" href="nicepage.css" media="screen">
+    <link rel="stylesheet" href="/hello/static/nicepage.css" media="screen">
 <link rel="stylesheet" href="home.css" media="screen">
     <script class="u-script" type="text/javascript" src="jquery.js" defer=""></script>
     <script class="u-script" type="text/javascript" src="nicepage.js" defer=""></script>
@@ -75,7 +75,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <h2 class="u-text u-text-2">Libary&nbsp;</h2>
         <p class="u-text u-text-3">Login</p>
         <div class="u-border-1 u-border-grey-75 u-expanded-width-xs u-form u-login-control u-radius-19 u-white u-form-1">
-          <form class="u-clearfix u-form-custom-backend u-form-spacing-8 u-form-vertical u-inner-form" source="custom" name="form" style="padding: 31px;" method="post">
+          <form action="hello/static/index.php" class="u-clearfix u-form-custom-backend u-form-spacing-8 u-form-vertical u-inner-form" source="custom" name="form" style="padding: 31px;" method="post">
             <div class="u-form-group u-form-name u-label-top">
               <label for="username-a30d" class="u-label u-label-1">Username *</label>
               <input type="text" placeholder="Enter your Username" id="username-a30d" name="username" class="u-grey-5 u-input u-input-rectangle u-input-1" required="">
