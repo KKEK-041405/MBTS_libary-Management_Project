@@ -2,8 +2,7 @@
 include('sql_query\config.php');
     if(isset($_SESSION["is_LoggedIn"])){
         if($_SESSION["is_LoggedIn"]){
-            echo $_SESSION["is_admin"];
-            ($_SESSION["is_admin"])?header("Location: admin.php"):header("Location: student.php");
+            ($_SESSION["is_admin"])?header("Location: admin.php?tab=books"):header("Location: student.php?tab=books");
         }
     }
     ?>
@@ -15,29 +14,38 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if($_POST["username"] != "" && $_POST['password'] != ""){
       $username = $_POST["username"];
       $password = $_POST['password'];
-      $result =  mysqli_query($conn,"SELECT * FROM `login_details` WHERE Username = '$username' AND Password = '$password'"); 
+      $result =  mysqli_query($conn,"SELECT * FROM `login_details` WHERE Username = '$username'");
+
       $rows = mysqli_fetch_assoc($result);
       //is valid user
       if($rows){    
+          if($rows['Password'] == $password){
           $_SESSION["is_LoggedIn"]  = true;
           //is admin
           if($rows['is_admin'] == 1){
-              print("helsjflksdflksdjflsfls");
-              header("Location: admin.php");
+              //sssheader("Location: admin.php");
               $_SESSION["username"] = $username;
               $_SESSION["is_admin"] = true;
               // $columns = array_keys($row);
-              // header("Location: admin.php");
-          }
-          else{
-              print("helsjflksdflksdjflsfls");
+              $newUrls = "/admin.php?tab=books";
+            }
+            else{
               $_SESSION["username"] = $username;
               $_SESSION["is_admin"] = false;
-              header("Location: student.php");
+              $newUrls = "/student.php?tab=books";
+            }
+          if ($rows["is_FirstLogin"]) {
+              $newUrls = "/UpdatePassword.php";
+          }
+          header("Location: ".$newUrls);
+          }
+          else{
+            $_SESSION["passwordincorrect"] = true;
           }
       }
-
-
+      else{
+        $_SESSION["usernotexits"] = true;
+      }
   }
 }
 
@@ -50,14 +58,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <meta name="keywords" content="MBTS libary,Libary, MBTS Govt. Polytechnic">
     <meta name="description" content="welcome to MBTS libary.">
     <title>MBTS libary</title>
-    <link rel="stylesheet" href="/hello/static/nicepage.css" media="screen">
-<link rel="stylesheet" href="home.css" media="screen">
-    <script class="u-script" type="text/javascript" src="jquery.js" defer=""></script>
-    <script class="u-script" type="text/javascript" src="nicepage.js" defer=""></script>
+    <link rel="stylesheet" href="/static/nicepage.css" media="screen">
+<link rel="stylesheet" href="/static/home.css" media="screen">
+    <script class="u-script" type="text/javascript" src="/static/jquery.js" defer=""></script>
+    <script class="u-script" type="text/javascript" src="/static/nicepage.js" defer=""></script>
     <meta name="generator" content="Nicepage 5.10.3, nicepage.com">
-    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
-    
-    <!-- vxdf -->
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">    
     <script type="application/ld+json">{
 		"@context": "http://schema.org",
 		"@type": "Organization",
@@ -75,7 +81,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <h2 class="u-text u-text-2">Libary&nbsp;</h2>
         <p class="u-text u-text-3">Login</p>
         <div class="u-border-1 u-border-grey-75 u-expanded-width-xs u-form u-login-control u-radius-19 u-white u-form-1">
-          <form action="hello/static/index.php" class="u-clearfix u-form-custom-backend u-form-spacing-8 u-form-vertical u-inner-form" source="custom" name="form" style="padding: 31px;" method="post">
+          <form action="/index.php" class="u-clearfix u-form-custom-backend u-form-spacing-8 u-form-vertical u-inner-form" source="custom" name="form" style="padding: 31px;" method="post">
             <div class="u-form-group u-form-name u-label-top">
               <label for="username-a30d" class="u-label u-label-1">Username *</label>
               <input type="text" placeholder="Enter your Username" id="username-a30d" name="username" class="u-grey-5 u-input u-input-rectangle u-input-1" required="">
@@ -85,10 +91,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
               <input type="text" placeholder="Enter your Password" id="password-a30d" name="password" class="u-grey-5 u-input u-input-rectangle u-input-2" required="">
             </div>
             <div class="u-align-right u-form-group u-form-submit u-label-top">
-              <a href="#" class="u-active-palette-2-base u-border-none u-btn u-btn-submit u-button-style u-palette-4-base u-btn-1">Login</a>
-              <input type="submit" value="submit" class="u-form-control-hidden">
+              <input type="submit" class="u-active-palette-2-base u-border-none u-btn u-btn-submit u-button-style u-palette-4-base u-btn-1" value="submit" class="u-form-control">
             </div>
             <input type="hidden" value="" name="recaptchaResponse">
+            <?php 
+            if(isset($_SESSION["passwordincorrect"])){
+              if($_SESSION["passwordincorrect"]){
+                echo "<h6>Incorrect Password!</h6>";
+              }
+            }?>
+            
           </form>
         </div>
       </div>

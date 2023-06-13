@@ -6,20 +6,23 @@
     
     
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
-        $Username =   $_POST['pin'];
-        $password   =   $_POST['password'];
-        $confrimpass      =   $_POST['confrimpass'];
+        $UsernameINS =   $_POST['pin'];
+        $name   =   $_POST['password'];
+        $branch      =   $_POST['confrimpass'];
+        $scheme = $_POST['Scheme'];
+        $gender = $_POST['Gender'];
         
-        $result = mysqli_query($conn,"UPDATE `login_details` SET `Username`='',`Password`='$password'");
+        $result = mysqli_query($conn,"SELECT * FROM `login_details` WHERE `Username` = '$UsernameINS'");
         $row = mysqli_fetch_assoc($result);
         if($row){
-            $_SESSION["BOOK_exist"] = true;
-            header("Location: admin.php?tab=add_Book");
+            $_SESSION["student_exist"] = true;
+            header("Location: admin.php?tab=ADD_students");
         }
         if(!$row){
-            mysqli_query($conn,"INSERT INTO `books` (`Accession_no`,`Title`,`Branch`,`Author`,`is_available`) VALUES ('$AccessionNo','$BookTitle','$Branch','$Author','$is_available')");
-            $_SESSION['AddBook_Sucess'] = true;
-            header("Location: admin.php?tab=add_Book");
+            mysqli_query($conn,"INSERT INTO `login_details` (`Username`,`Password`,`is_admin`,`is_FirstLogin`) VALUES ('$UsernameINS','1234','0','1')");
+            mysqli_query($conn,"INSERT INTO `student_details`(`Pin_no`, `Name`, `Gender`, `Scheme`, `Branch`) VALUES ('$UsernameINS','$name','$gender','$scheme','$branch')");
+            $_SESSION['Addstudent_Sucess'] = true;
+            header("Location: admin.php?tab=ADD_students");
         }
     }
 ?>

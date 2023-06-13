@@ -7,12 +7,11 @@
            echo isset($_POST['confrimReciversPinno1']);
            $date = date("Y/m/d");
            echo $date;
-           mysqli_query($conn,"UPDATE `transactions` SET `Status` = 'book was collected by student',`issuance_date` =  '$date' WHERE `Accession_no` = '$id' AND `Reciver_pin-no` = '$pin'");
-
+           $newDate  = date('Y-m-d', strtotime($date . ' +15 days'));
+           echo $newDate;
+           mysqli_query($conn,"UPDATE `transactions` SET `Status` = 'book was collected by student',`issuance_date` =  '$date',`Due_date` = '$newDate'  WHERE `Accession_no` = '$id' AND `Reciver_pin-no` = '$pin' AND `Status` = 'Collect Book by this evening'");
         }
-
     }
-
-    // header("Location: index.php");
+    header("Location: index.php");
     
 ?>

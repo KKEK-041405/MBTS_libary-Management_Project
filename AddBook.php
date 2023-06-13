@@ -13,6 +13,7 @@
         
         $result = mysqli_query($conn,"SELECT * FROM `books` WHERE `Accession_no` = '$AccessionNo'");
         $row = mysqli_fetch_assoc($result);
+        echo $AccessionNo.$Author.$BookTitle.$Branch;
         if($row){
             $_SESSION["BOOK_exist"] = true;
             header("Location: admin.php?tab=add_Book");
